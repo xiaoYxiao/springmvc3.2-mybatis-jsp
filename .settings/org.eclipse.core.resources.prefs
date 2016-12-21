@@ -1,0 +1,16 @@
+eclipse.preferences.version=1
+encoding//src/main/resources/extremecomponents.properties=UTF-8
+encoding//src/main/resources/jdbc.properties=UTF-8
+encoding//src/main/resources/log4j.properties=UTF-8
+encoding//src/main/webapp/WEB-INF/common/common_info.jsp=UTF-8
+encoding//src/main/webapp/WEB-INF/common/meta_info.jsp=UTF-8
+encoding//src/main/webapp/WEB-INF/common/metas.jsp=UTF-8
+encoding//src/main/webapp/WEB-INF/common/tags.jsp=UTF-8
+encoding//src/main/webapp/WEB-INF/error/error.jsp=UTF-8
+encoding//src/main/webapp/WEB-INF/jsp/addAddress.jsp=UTF-8
+encoding//src/main/webapp/WEB-INF/jsp/addNewAddress.jsp=UTF-8
+encoding//src/main/webapp/WEB-INF/jsp/addUser.jsp=UTF-8
+encoding//src/main/webapp/WEB-INF/jsp/errorPage.jsp=UTF-8
+encoding//src/main/webapp/WEB-INF/jsp/listUser.jsp=UTF-8
+encoding//src/main/webapp/WEB-INF/jsp/updateUser.jsp=UTF-8
+encoding//src/main/webapp/index.jsp=UTF-8

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+                      http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+  version="3.0">
+
+	<display-name>springmvc3.2-mybatis-jsp</display-name>
+	<!-- Spring和mybatis的配置文件 -->  
+    <context-param>  
+        <param-name>contextConfigLocation</param-name>  
+        <param-value>classpath:applicationContext.xml</param-value>  
+    </context-param> 
+
+	<!-- 统一编码过虑器 -->
+	<filter>
+		<filter-name>encodingFilter</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+		<init-param>
+			<param-name>forceEncoding</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>encodingFilter</filter-name>
+		<url-pattern>*.do</url-pattern>
+	</filter-mapping>
+
+	<!--配置文件jsp标签 :为了使导出功能有效，你需要设置导出过滤器。这是一个仅用于导出功能的可选配置。-->
+	<!-- 过滤器还有一个可选的初始化参数，用于决定什么时候生成报头（headers）。我发现大多数的servlet容器 倾向于在调用过滤器的doFilter()方法后才设置响应报头（response headers）。
+	然而，一些servlet容器只有在 调用过滤器的doFilter()方法前设置响应报头，过滤器才能正常工作。
+	默认的方法是调用过滤器的doFilter()方法后 设置响应报头，你可以通过使用responseHeadersSetBeforeDoFilter这个初始化参数调整它。 -->
+	<filter>
+		<filter-name>eXtremeExport</filter-name>
+		<filter-class>com.demo.common.extreme.filter.ExtremeExportFilter</filter-class>
+		<init-param>
+			<param-name>responseHeadersSetBeforeDoFilter</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>eXtremeExport</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	<!--分页标签
+	<filter>
+		<filter-name>pageFilter</filter-name>
+		<filter-class>com.demo.common.page.filter.PageFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>pageFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	 -->
+	<context-param>
+		<description>Extremecomponents style seted</description>
+		<param-name>extremecomponentsPreferencesLocation</param-name>
+		<param-value>/extremecomponents.properties</param-value>
+	</context-param>
+	
+	<!-- 加载log4j配置文件 -->
+	<context-param>
+		<param-name>log4jConfigLocation</param-name>
+		<param-value>/WEB-INF/classes/log4j.properties</param-value>
+	</context-param>
+	<listener>
+		<listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
+	</listener>
+	
+	<!-- Spring 启动 -->
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+	<!-- Spring 防内存溢出 -->
+	<listener>
+		<listener-class>org.springframework.web.util.IntrospectorCleanupListener</listener-class>
+	</listener>
+	
+	<!-- Springmvc view分发器 --> 
+	<servlet>
+		<servlet-name>springmvc</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>/WEB-INF/springmvc-servlet3.2.xml</param-value>
+			<!-- springmvc-servlet3.2.xml和springmvc-servlet3.0.xml随便一个配置都可以使用 -->
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+		<async-supported>true</async-supported>  
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>springmvc</servlet-name>
+		<url-pattern>*.do</url-pattern>
+	</servlet-mapping>
+
+	<welcome-file-list>
+		<welcome-file>index.html</welcome-file>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+	<display-name>Archetype Created Web Application</display-name>
+</web-app>

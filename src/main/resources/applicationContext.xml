@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jee="http://www.springframework.org/schema/jee"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans    
+                        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd    
+                        http://www.springframework.org/schema/context    
+                        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+                        http://www.springframework.org/schema/jee  
+                        http://www.springframework.org/schema/jee/spring-jee-3.2.xsd    
+                        http://www.springframework.org/schema/tx  
+                        http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+				        http://www.springframework.org/schema/aop 
+				        http://www.springframework.org/schema/aop/spring-aop-3.2.xsd"
+	default-lazy-init="true">
+	
+	<!-- 自动扫描,spring-servlet已经扫描过controller不需重复 -->
+	<context:component-scan base-package="com.demo.user" >
+	  <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+	</context:component-scan>
+	<!-- 引入配置文件 -->
+	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location" value="classpath:jdbc.properties" />
+	</bean>
+
+	<!--dbcp配置： http://www.myhack58.com/Article/60/61/2014/42761.htm -->
+	<bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close">
+		<property name="driverClassName" value="${driver}" />
+		<property name="url" value="${url}" />
+		<property name="username" value="${username}" />
+		<property name="password" value="${password}" />
+		<property name="initialSize" value="${initialSize}"></property><!-- 初始化连接大小 -->
+		<property name="maxActive" value="${maxActive}"></property><!-- 连接池最大数量 -->
+		<property name="maxIdle" value="${maxIdle}"></property><!-- 连接池最大空闲 -->
+		<property name="minIdle" value="${minIdle}"></property><!-- 连接池最小空闲 -->
+		<property name="maxWait" value="${maxWait}"></property><!-- 获取连接最大等待时间 -->
+		<property name="validationQuery" value="SELECT COUNT(1) FROM DUAL "/>  <!--一条sql语句，用来验证数据库连接是否正常。这条语句必须是一个查询模式，并至少返回一条数据。可以为任何可以验证数据库连接是否正常的sql-->
+        <property name="testOnBorrow" value="true"/> <!-- 默认值是true，借出连接时不要测试，性能有非常大的影响，性能会下降7-10倍。但是为false时候会造成系统报错-->
+        <property name="testWhileIdle" value="true"/>  <!-- 表示每30秒，取出3条连接，使用validationQuery = "SELECT 1" 中的SQL进行测试 ，测试不成功就销毁连接。销毁连接后，连接数量就少了，如果小于minIdle数量，就新建连接。-->
+       	<property name="testOnReturn" value="true"/><!-- 返回对象时是否进行验证，检查对象是否有效，默认为false  -->
+        <property name="timeBetweenEvictionRunsMillis" value="30000"/>  <!--每30秒运行一次空闲连接回收器-->
+        <property name="minEvictableIdleTimeMillis" value="1800000"/>  <!--池中的连接空闲30分钟后被回收,默认值就是30分钟-->
+        <property name="numTestsPerEvictionRun" value="3"/>  <!--在每次空闲连接回收器线程(如果有)运行时检查的连接数量，默认值就是3-->
+        <property name="logAbandoned" value="true"/>  <!--是否记录中断事件， 默认为 false-->
+	</bean>
+	
+	<!-- spring和MyBatis完美整合，不需要mybatis的配置映射文件 -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="configLocation" value="classpath:mybatis-config.xml"></property><!-- 配置mybatis的日志记录 -->  
+		<property name="mapperLocations" value="classpath:com/demo/**/dao/mapping/*.xml"/><!-- 自动扫描mapping.xml文件 -->
+	</bean>
+
+	<!-- DAO接口所在包名，Spring会自动查找其下的接口 -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.demo.user.dao" />
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+		<!-- 有多个数据源的时候必须指定，这里是单个可以不指定(会自动装配) -->
+		<!-- 在mybatis-spring内部，即在配置MapperScannerConfigurer时，手册告诉我们，可以不配置sqlSessionFactoryName和sqlTemplateName，
+		因为不配置的情况下spring会自动进行注入。但是，手册没有告诉我们它是怎么来注入的，如果你仔细查看源代码，你会发现，它使用了让人悲剧的@Autowired悲剧来进行注解 -->
+	</bean>
+
+	<!-- (事务管理)transaction manager, use JtaTransactionManager for global tx -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	 <!-- 用注解来实现事务管理 -->
+	<tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true" />
+	
+	<!-- 用于持有ApplicationContext,可以使用SpringContextHolder.getBean('xxxx')的静态方法得到spring bean对象 
+    <bean class="com.demo.common.util.SpringContextHolder" lazy-init="false" />  -->  
+</beans>  
